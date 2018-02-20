@@ -1,7 +1,7 @@
 /*
 Coding Challenge for Kuali
 Design set of objects to manage elevator simulation
-Justin Masters Feb. 18, 2018
+Justin Masters Feb. 19, 2018
 */
 
 class callElevatorRequest {
@@ -12,11 +12,18 @@ class callElevatorRequest {
 }
 
 class Elevator {
-    constructor() {
+    constructor(elevatorNumber) {
+        this.elevatorNumber = elevatorNumber;
         this.floor = 1;
-        this.status = "idle";
+        this.status = "idle";  //idle, goingUp, goingDown, underMaintenance
         this.floorsPassedCount = 0;
         this.tripsCount = 0;
+        this.floorButtonsPressed = [];
+    }
+
+    //assuming this receives request from passenger in elevator
+    pressFloorButton(floorNumber) {
+        //if valid floor button is pressed, add to array
     }
 
     goUp() {
@@ -29,12 +36,10 @@ class Elevator {
         //decrement floorsPassedCount
     }
 
-    //TODO: this needs to go into elevator controller so it knows elevator number
     loadAndUnloadPassengers() {
         //report opening doors, waiting for passengers to load/unload, closing doors
     }
 
-    //TODO: this needs to go into elevator controller so it knows elevator number
     reportFloorNumber() {
         console.log(`Elevator ` + `` + ` on floor ` + floor + `.`);
     }
@@ -46,8 +51,15 @@ class ElevatorController {
         this.numFloors = numFloors;
         this.elevatorList = []
         for (let i = 0; i < numElevators; i++) {
-            elevatorList[i] = new Elevator();
+            elevatorList[i] = new Elevator(i+1);
         }
     }
 
+    //assuming this receives request from person outside elevator
+    callElevator(callElevatorRequest) {
+        findIdleElevatorOnRequestFloor();
+        findElevatorPassingInCorrectDirection();
+        findClosestIdleElevator();
+        runElevator();
+    }
 }
