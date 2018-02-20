@@ -80,10 +80,46 @@ class ElevatorController {
     }
 
     findElevator(direction, floor) {
-        while (elevatorNeeded) {  //TODO:  logic for when to start/stop loop
-            this.findIdleElevatorOnRequestFloor(direction, floor);
-            this.findElevatorPassingInCorrectDirection(direction, floor);
-            this.findClosestIdleElevator(direction, floor);
+        let elevatorFound = 0;
+        while (elevatorFound == 0) {
+            elevatorFound = this.findIdleElevatorOnRequestFloor(floor);
+            elevatorFound = this.findElevatorPassingInCorrectDirection(direction, floor);
+            elevatorFound = this.findClosestIdleElevator(floor);
         }
+        return elevatorFound;
+    }
+
+    findIdleElevatorOnRequestFloor(floor) {
+        for (let elevator of this.elevatorList) {
+            if (elevator.status === "idle") {
+                return elevator.floor === floor ? elevator.elevatorNumber : 0;
+            }
+        }
+        return 0;
+    }
+
+    findElevatorPassingInCorrectDirection(direction, floor) {
+        let availableElevators = [];
+        for (let elevator of this.elevatorList) {
+            if (elevator.status === direction) {
+                if (elevator.status === "goingUp" && elevator.floor < floor) {
+                    availableElevators.push(elevator);
+                } else if (elevator.status === "goingDown" && elevator.floor > floor) {
+                    availableElevators.push(elevator);
+                }
+            }
+        }
+        if (availableElevators.length > 0) {
+            availableElevators.sort(compareElevators);
+            return availableElevators[0].elevatorNumber;
+        } else return 0;
+    }
+
+    findClosestIdleElevator(floor) {
+
+    }
+
+    compareElevators(a, b) {
+        
     }
 }
