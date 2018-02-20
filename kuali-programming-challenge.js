@@ -17,15 +17,25 @@ class Elevator {
     }
 
     runElevator() {
+        while (this.floorButtonsPressed.length > 0) {
+
+        }
 
     }
 
     //assuming this receives request from passenger in elevator
     pressFloorButton(floorNumber) {
-        if (validFloorNumber) {
+        if (this.floorNumberIsValid(floorNumber)) {
             this.floorButtonsPressed.push(floorNumber);
             this.floorButtonsPressed.sort();
-        }
+        } //else do nothing/turn off button light
+    }
+
+    floorNumberIsValid(floorNumber) {
+        if (this.status === "idle") return true;
+        else if (this.status === "goingUp") return floorNumber > this.floor ? true : false;
+        else if (this.status === "goingDown") return floorNumber < this.floor ? true : false;
+        else return false;
     }
 
     goUp() {
@@ -64,23 +74,16 @@ class ElevatorController {
     }
 
     //assuming this receives request from person outside elevator
-    callElevator(callElevatorRequest) {
-        let availableElevatorNumber = this.findElevator();
-        this.elevatorList[availableElevatorNumber].runElevator();
+    callElevator(direction, floor) {
+        let availableElevatorNumber = this.findElevator(direction, floor);
+        this.elevatorList[availableElevatorNumber].runElevator(direction, floor);
     }
 
-    findElevator() {
+    findElevator(direction, floor) {
         while (elevatorNeeded) {  //TODO:  logic for when to start/stop loop
-            this.findIdleElevatorOnRequestFloor();
-            this.findElevatorPassingInCorrectDirection();
-            this.findClosestIdleElevator();
+            this.findIdleElevatorOnRequestFloor(direction, floor);
+            this.findElevatorPassingInCorrectDirection(direction, floor);
+            this.findClosestIdleElevator(direction, floor);
         }
-    }
-}
-
-class callElevatorRequest {
-    constructor (direction, floor) {
-        this.direction = direction;
-        this.floor = floor;
     }
 }
