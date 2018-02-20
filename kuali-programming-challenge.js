@@ -16,11 +16,30 @@ class Elevator {
         this.floorButtonsPressed = [];
     }
 
-    runElevator() {
+    runElevator(direction, floor) {
+        if (this.floor === floor) this.loadAndUnloadPassengers();
+        this.status = direction;
+        
         while (this.floorButtonsPressed.length > 0) {
-            //TODO: add logic here
-        }
+            if (direction === "goingUp") {
+                this.floor++;
+            } else if (direction === "goingDown") {
+                this.floor--;
+            }
+            this.floorsPassedCount++;
+            this.reportFloorNumber();
 
+            let lowestSelectedFloor = this.floorButtonsPressed[0];
+            let highestSelectedFloor = this.floorButtonsPressed[this.floorButtonsPressed.length-1];
+            if (direction === "goingUp" && this.floor === lowestSelectedFloor) {
+                this.floorButtonsPressed.shift();
+                this.loadAndUnloadPassengers();
+            } else if (direction === "goingDown" && this.floor === highestSelectedFloor) {
+                this.floorButtonsPressed.pop();
+                this.loadAndUnloadPassengers();
+            }
+        }
+        this.status = "idle";
         this.tripsCount++;
         if (tripsCount > 99) {
             this.status = "underMaintenance";
@@ -28,6 +47,7 @@ class Elevator {
     }
 
     //assuming this receives request from passenger in elevator
+    //can occur while elevator is running
     pressFloorButton(floorNumber) {
         if (this.floorNumberIsValid(floorNumber)) {
             this.floorButtonsPressed.push(floorNumber);
@@ -36,23 +56,11 @@ class Elevator {
     }
 
     floorNumberIsValid(floorNumber) {
-        if (this.status === "idle") return true;
-        else if (this.status === "goingUp") return floorNumber > this.floor ? true : false;
-        else if (this.status === "goingDown") return floorNumber < this.floor ? true : false;
-        else return false;
-    }
-
-    goUp() {
-        if (this.floor < this.maxFloor) {  // move this if statement to run method
-            this.floor++;
-            this.floorsPassedCount++
-        }
-    }
-
-    goDown() {
-        if (this.floor > this.minFloor) {  // move this if statement to run method
-            this.floor--; 
-            this.floorsPassedCount--;
+        if (floorNumber >= this.minFloor && floorNumber <= this.maxFloor) {
+            if (this.status === "idle") return true;
+            else if (this.status === "goingUp") return floorNumber > this.floor ? true : false;
+            else if (this.status === "goingDown") return floorNumber < this.floor ? true : false;
+            else return false;
         }
     }
 
@@ -87,7 +95,9 @@ class ElevatorController {
         let elevatorFound = 0;
         while (elevatorFound == 0) {
             elevatorFound = this.findIdleElevatorOnRequestFloor(floor);
+            if (elevatorFound > 0) break;
             elevatorFound = this.findElevatorPassingInCorrectDirection(direction, floor);
+            if (elevatorFound > 0) break;
             elevatorFound = this.findClosestIdleElevator(floor);
         }
         return elevatorFound;
