@@ -22,21 +22,27 @@ class Elevator {
 
     //assuming this receives request from passenger in elevator
     pressFloorButton(floorNumber) {
-        //if valid floor button is pressed, add to array
+        if (validFloorNumber) {
+            this.floorButtonsPressed.push(floorNumber);
+            this.floorButtonsPressed.sort();
+        }
     }
 
     goUp() {
-        //if floor < maxFloor, go up one floor
-        //increment floorsPassedCount
+        if (this.floor < this.maxFloor) {
+            this.floor++;
+            this.floorsPassedCount++
+        }
     }
 
     goDown() {
-        //if floor > 1, go down one floor 
-        //decrement floorsPassedCount
+        if (this.floor > this.minFloor) {
+            this.floor--; 
+            this.floorsPassedCount--;
+        }
     }
 
     loadAndUnloadPassengers() {
-        //report opening doors, waiting for passengers to load/unload, closing doors
         console.log(`Elevator ` + elevatorNumber + ` opening doors.\n
             Elevator ` + elevatorNumber + ` loading and unloading passengers.\n
             Elevator ` + elevatorNumber + ` closing doors.`);
@@ -59,12 +65,16 @@ class ElevatorController {
 
     //assuming this receives request from person outside elevator
     callElevator(callElevatorRequest) {
+        let availableElevatorNumber = this.findElevator();
+        this.elevatorList[availableElevatorNumber].runElevator();
+    }
+
+    findElevator() {
         while (elevatorNeeded) {  //TODO:  logic for when to start/stop loop
-            findIdleElevatorOnRequestFloor();
-            findElevatorPassingInCorrectDirection();
-            findClosestIdleElevator();
+            this.findIdleElevatorOnRequestFloor();
+            this.findElevatorPassingInCorrectDirection();
+            this.findClosestIdleElevator();
         }
-        runElevator();
     }
 }
 
