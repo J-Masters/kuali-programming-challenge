@@ -18,9 +18,13 @@ class Elevator {
 
     runElevator() {
         while (this.floorButtonsPressed.length > 0) {
-
+            //TODO: add logic here
         }
 
+        this.tripsCount++;
+        if (tripsCount > 99) {
+            this.status = "underMaintenance";
+        }
     }
 
     //assuming this receives request from passenger in elevator
@@ -39,14 +43,14 @@ class Elevator {
     }
 
     goUp() {
-        if (this.floor < this.maxFloor) {
+        if (this.floor < this.maxFloor) {  // move this if statement to run method
             this.floor++;
             this.floorsPassedCount++
         }
     }
 
     goDown() {
-        if (this.floor > this.minFloor) {
+        if (this.floor > this.minFloor) {  // move this if statement to run method
             this.floor--; 
             this.floorsPassedCount--;
         }
@@ -101,25 +105,47 @@ class ElevatorController {
     findElevatorPassingInCorrectDirection(direction, floor) {
         let availableElevators = [];
         for (let elevator of this.elevatorList) {
-            if (elevator.status === direction) {
-                if (elevator.status === "goingUp" && elevator.floor < floor) {
-                    availableElevators.push(elevator);
-                } else if (elevator.status === "goingDown" && elevator.floor > floor) {
-                    availableElevators.push(elevator);
-                }
+            if (elevatorIsAvailable(elevator, direction, floor)) {
+                availableElevators.push(elevator);
             }
         }
         if (availableElevators.length > 0) {
             availableElevators.sort(compareElevators);
             return availableElevators[0].elevatorNumber;
-        } else return 0;
+        } else {
+            return 0;
+        }
     }
 
     findClosestIdleElevator(floor) {
+        let availableElevators = [];
+        for (let elevator of this.elevatorList) {
+            if (elevator.status === "idle") {
+                availableElevators.push(elevator);
+            }
+        }
+        if (availableElevators.length > 0) {
+            availableElevators.sort(compareElevators);
+            return availableElevators[0].elevatorNumber;
+        } else {
+            return 0;
+        }
+    }
 
+    elevatorIsAvailable(elevator, direction, floor) {
+        if (elevator.status === direction) {
+            if (elevator.status === "goingUp" && elevator.floor < floor) {
+                return true;
+            } else if (elevator.status === "goingDown" && elevator.floor > floor) {
+                return true;
+            } 
+        }
+        return false;
     }
 
     compareElevators(a, b) {
-        
+        let aDistanceToRequest = Math.abs(a.floor - floor);
+        let bDistanceToRequest = Math.abs(b.floor - floor);
+        return bDistanceToRequest - aDistanceToRequest;
     }
 }
